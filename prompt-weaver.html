@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WAN 2.2 Enhanced Prompt Builder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #fff, #f0f8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tab-button {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .tab-button.active {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .tab-button.restricted {
+            background: rgba(255, 193, 7, 0.2);
+            border-color: rgba(255, 193, 7, 0.5);
+            cursor: not-allowed;
+        }
+
+        .tab-content {
+            display: none;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            min-height: 500px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-content h2 {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #fff;
+        }
+
+        .tab-content p {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .input-group {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #fff;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .custom-input, select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .custom-input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .custom-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        select option {
+            background: #1e3c72;
+            color: #fff;
+        }
+
+        .style-packs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .style-pack {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+        }
+
+        .style-pack:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .style-pack.selected {
+            border-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.2);
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+        }
+
+        .style-pack h3 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .style-pack p {
+            opacity: 0.8;
+            font-size: 0.95rem;
+            text-align: left;
+            margin: 0;
+        }
+
+        .generate-section {
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .generate-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+
+        .output-section {
+            margin-top: 30px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .output-section h3 {
+            margin-bottom: 15px;
+            color: #4CAF50;
+        }
+
+        .output-text {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .copy-btn {
+            margin-top: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .slider-container {
+            margin: 20px 0;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(76, 175, 80, 0.3);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 10px rgba(76, 175, 80, 0.3);
+        }
+
+        .slider-value {
+            text-align: center;
+            margin-top: 10px;
+            font-weight: 600;
+            color: #4CAF50;
+        }
+
+        .advanced-controls {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .advanced-controls h3 {
+            margin-bottom: 20px;
+            color: #4CAF50;
+            text-align: center;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            cursor: pointer;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            accent-color: #4CAF50;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            font-size: 16px;
+            text-transform: none;
+            letter-spacing: normal;
+            cursor: pointer;
+        }
+
+        .warning-box {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #ffc107;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            margin: 15% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            border: 2px solid rgba(255, 193, 7, 0.5);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal h2 {
+            color: #ffc107;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .modal p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .modal-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn.confirm {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .modal-btn.cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .tab-button {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .form-row {
+                flex-direction: column;
+            }
+
+            .input-group {
+                min-width: auto;
+            }
+
+            .style-packs {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+                padding: 20px;
+            }
+
+            .modal-buttons {
+                flex-direction: column;
+            }
+        }
+
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 WAN 2.2 Enhanced Prompt Builder</h1>
+            <p class="tagline">Transform simple ideas into model-optimized cinematic prompts</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('cinematic')">🎥 Cinematic Lab</button>
+            <button class="tab-button" onclick="switchTab('style-weaver')">✨ Style Weaver</button>
+            <button class="tab-button" onclick="switchTab('motion-craft')">🎭 Motion Craft</button>
+            <button class="tab-button restricted" onclick="checkAgeRestriction('pro-controls')">⚙️ Pro Controls</button>
+            <button class="tab-button restricted" onclick="checkAgeRestriction('realism-engine')">🎯 Realism Engine</button>
+        </div>
+
+        <!-- Age Verification Modal -->
+        <div id="age-verification-modal" class="modal">
+            <div class="modal-content">
+                <h2>⚠️ Age Verification Required</h2>
+                <p>This section contains advanced settings for mature content creation.</p>
+                <p><strong>You must be 18 years or older to access these features.</strong></p>
+                <p>By clicking "I am 18+", you confirm that you are of legal age and understand that these tools are intended for responsible adult use only.</p>
+
+                <div class="modal-buttons">
+                    <button class="modal-btn confirm" onclick="confirmAge()">I am 18+ Years Old</button>
+                    <button class="modal-btn cancel" onclick="closeModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cinematic Lab Tab -->
+        <div id="cinematic" class="tab-content active">
+            <h2>🎥 Cinematic Lab</h2>
+            <p>Don't worry about technical details - the Style Weaver adds professional cinematography automatically! ✨</p>
+
+            <!-- ADDED: Dropdowns with enhanced movement options -->
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="shot-opening">Shot Opening</label>
+                    <select id="shot-opening" class="custom-input">
+                        <option value="">Select Shot Opening</option>
+                        <option value="extreme-wide-shot">Extreme wide shot</option>
+                        <option value="wide-shot">Wide shot</option>
+                        <option value="medium-shot">Medium shot</option>
+                        <option value="close-up">Close-up</option>
+                        <option value="extreme-close-up">Extreme close-up</option>
+                        <option value="over-the-shoulder-shot">Over-the-shoulder shot</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="camera-movement-main">Camera Movement</label>
+                    <select id="camera-movement-main" class="custom-input">
+                        <option value="">Select Camera Movement</option>
+                        <option value="static">Static</option>
+                        <option value="pan-left">Pan left</option>
+                        <option value="pan-right">Pan right</option>
+                        <option value="tilt-up">Tilt up</option>
+                        <option value="tilt-down">Tilt down</option>
+                        <option value="tracking-left">Tracking left</option>
+                        <option value="tracking-right">Tracking right</option>
+                        <option value="tracking-forward">Tracking forward</option>
+                        <option value="tracking-backward">Tracking backward</option>
+                        <option value="dolly-in">Dolly in</option>
+                        <option value="dolly-out">Dolly out</option>
+                        <option value="zoom-in">Zoom in</option>
+                        <option value="zoom-out">Zoom out</option>
+                        <option value="orbit-left">Orbit left</option>
+                        <option value="orbit-right">Orbit right</option>
+                        <option value="crane-up">Crane up</option>
+                        <option value="crane-down">Crane down</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="motion">Motion</label>
+                    <select id="motion" class="custom-input">
+                        <option value="">Select Motion</option>
+                        <option value="walking">Walking</option>
+                        <option value="running">Running</option>
+                        <option value="jumping">Jumping</option>
+                        <option value="fighting">Fighting</option>
+                        <option value="dancing">Dancing</option>
+                        <option value="flying">Flying</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="style">Style</label>
+                    <select id="style" class="custom-input">
+                        <option value="">Select Style</option>
+                        <option value="film-noir">Film Noir</option>
+                        <option value="cyberpunk">Cyberpunk</option>
+                        <option value="golden-hour">Golden Hour</option>
+                        <option value="fantasy">Fantasy</option>
+                        <option value="action">Action</option>
+                        <option value="natural">Natural</option>
+                        <option value="horror">Horror</option>
+                        <option value="studio">Studio</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="lighting">Lighting</label>
+                    <select id="lighting" class="custom-input">
+                        <option value="">Select Lighting</option>
+                        <option value="soft-lighting">Soft lighting</option>
+                        <option value="harsh-lighting">Harsh lighting</option>
+                        <option value="backlit">Backlit</option>
+                        <option value="low-key-lighting">Low-key lighting</option>
+                        <option value="high-key-lighting">High-key lighting</option>
+                        <option value="neon-lighting">Neon lighting</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="technical">Technical</label>
+                    <select id="technical" class="custom-input">
+                        <option value="">Select Technical</option>
+                        <option value="8k-resolution">8k resolution</option>
+                        <option value="4k-resolution">4k resolution</option>
+                        <option value="hdr">HDR</option>
+                        <option value="slow-motion">Slow motion</option>
+                        <option value="time-lapse">Time lapse</option>
+                        <option value="motion-blur">Motion blur</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="custom-subject">Custom Subject:</label>
+                <input type="text" id="custom-subject" class="custom-input" placeholder="Enter your custom subject or idea...">
+            </div>
+
+            <p style="margin: 30px 0 20px 0; text-align: center; font-size: 1.1rem;">
+                Each style pack adds professional <strong>lighting, camera work, atmosphere, and mood</strong> optimized for AI video models:
+            </p>
+
+            <div class="style-packs">
+                <div class="style-pack" onclick="selectStylePack(this, 'film-noir')">
+                    <h3>🎬 Film Noir</h3>
+                    <p>Dramatic shadows, high contrast, venetian blind lighting</p>
+                </div>
+                <div class="style-pack" onclick="selectStylePack(this, 'cyberpunk')">
+                    <h3>🌆 Cyberpunk</h3>
+                    <p>Neon lighting, rain-soaked streets, digital atmosphere</p>
+                </div>
+                <div class="style-pack" onclick="selectStylePack(this, 'golden-hour')">
+                    <h3>🌅 Golden Hour</h3>
+                    <p>Warm golden tones, film grain, classic cinematography</p>
+                </div>
+                <div class="style-pack" onclick="selectStylePack(this, 'fantasy')">
+                    <h3>🧚 Fantasy</h3>
+                    <p>Soft focus, magical lighting, surreal atmosphere</p>
+                </div>
+                <div class="style-pack" onclick="selectStylePack(this, 'action')">
+                    <h3>💥 Action</h3>
+                    <p>Dynamic angles, dramatic lighting, high energy</p>
+                </div>
+                <div class="style-pack" onclick="selectStylePack(this, 'natural')">
+                    <h3>🌿 Natural</h3>
+                    <p>Golden hour lighting, natural colors, peaceful mood</p>
+                </div>
+                <div class="style-pack" onclick="selectStylePack(this, 'horror')">
+                    <h3>👻 Horror</h3>
+                    <p>Eerie shadows, cold lighting, ominous atmosphere</p>
+                </div>
+                <div class="style-pack" onclick="selectStylePack(this, 'studio')">
+                    <h3>💡 Studio</h3>
+                    <p>Bright lighting, clean composition, professional</p>
+                </div>
+            </div>
+
+            <div class="generate-section">
+                <button class="generate-btn" onclick="generateCinematicPrompt()">Generate Cinematic Prompt</button>
+            </div>
+
+            <div class="output-section" id="cinematic-output" style="display: none;">
+                <h3>🎬 Your Cinematic Prompt:</h3>
+                <div class="output-text" id="cinematic-result"></div>
+                <button class="copy-btn" onclick="copyToClipboard('cinematic-result')">Copy to Clipboard</button>
+            </div>
+        </div>
+
+        <!-- Style Weaver Tab -->
+        <div id="style-weaver" class="tab-content">
+            <h2>✨ Style Weaver</h2>
+            <p><strong>Professional cinematography controls</strong> for advanced users who want precise creative control over their AI video generation.</p>
+
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="camera-angle">Camera Angle</label>
+                    <select id="camera-angle" class="custom-input">
+                        <option value="">Select Camera Angle</option>
+                        <option value="low-angle">Low angle</option>
+                        <option value="high-angle">High angle</option>
+                        <option value="bird-eye-view">Bird's eye view</option>
+                        <option value="worm-eye-view">Worm's eye view</option>
+                        <option value="dutch-angle">Dutch angle</option>
+                        <option value="straight-on">Straight on</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="camera-movement">Camera Movement</label>
+                    <select id="camera-movement" class="custom-input">
+                        <option value="">Select Movement</option>
+                        <option value="static">Static</option>
+                        <option value="pan-left">Pan left</option>
+                        <option value="pan-right">Pan right</option>
+                        <option value="tilt-up">Tilt up</option>
+                        <option value="tilt-down">Tilt down</option>
+                        <option value="zoom-in">Zoom in</option>
+                        <option value="zoom-out">Zoom out</option>
+                        <option value="dolly-in">Dolly in</option>
+                        <option value="dolly-out">Dolly out</option>
+                        <option value="tracking-shot">Tracking shot</option>
+                        <option value="crane-shot">Crane shot</option>
+                        <option value="handheld">Handheld</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="lighting-setup">Lighting Setup</label>
+                    <select id="lighting-setup" class="custom-input">
+                        <option value="">Select Lighting</option>
+                        <option value="three-point-lighting">Three-point lighting</option>
+                        <option value="key-light-only">Key light only</option>
+                        <option value="rim-lighting">Rim lighting</option>
+                        <option value="side-lighting">Side lighting</option>
+                        <option value="back-lighting">Back lighting</option>
+                        <option value="soft-box-lighting">Soft box lighting</option>
+                        <option value="hard-lighting">Hard lighting</option>
+                        <option value="natural-window-light">Natural window light</option>
+                        <option value="golden-hour-lighting">Golden hour lighting</option>
+                        <option value="blue-hour-lighting">Blue hour lighting</option>
+                        <option value="candlelight">Candlelight</option>
+                        <option value="neon-lighting">Neon lighting</option>
+                        <option value="volumetric-lighting">Volumetric lighting</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="color-grading">Color Grading</label>
+                    <select id="color-grading" class="custom-input">
+                        <option value="">Select Color Grade</option>
+                        <option value="warm-tones">Warm tones</option>
+                        <option value="cool-tones">Cool tones</option>
+                        <option value="desaturated">Desaturated</option>
+                        <option value="high-contrast">High contrast</option>
+                        <option value="low-contrast">Low contrast</option>
+                        <option value="vintage-film">Vintage film</option>
+                        <option value="modern-digital">Modern digital</option>
+                        <option value="black-and-white">Black and white</option>
+                        <option value="sepia">Sepia</option>
+                        <option value="teal-orange">Teal and orange</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="slider-container">
+                <label for="depth-of-field">Depth of Field</label>
+                <input type="range" id="depth-of-field" class="slider" min="0" max="100" value="50">
+                <div class="slider-value" id="dof-value">50</div>
+            </div>
+
+            <div class="slider-container">
+                <label for="film-grain">Film Grain</label>
+                <input type="range" id="film-grain" class="slider" min="0" max="100" value="30">
+                <div class="slider-value" id="grain-value">30</div>
+            </div>
+
+            <div class="generate-section">
+                <button class="generate-btn" onclick="generateStyleWeaverPrompt()">Generate Advanced Prompt</button>
+            </div>
+
+            <div class="output-section" id="style-weaver-output" style="display: none;">
+                <h3>✨ Your Advanced Cinematic Prompt:</h3>
+                <div class="output-text" id="style-weaver-result"></div>
+                <button class="copy-btn" onclick="copyToClipboard('style-weaver-result')">Copy to Clipboard</button>
+            </div>
+        </div>
+
+        <!-- Motion Craft Tab -->
+        <div id="motion-craft" class="tab-content">
+            <h2>🎭 Motion Craft</h2>
+            <p><strong>Realistic motion and physics simulation</strong> for naturalistic AI video generation with proper momentum and gravity.</p>
+
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="motion-type">Motion Type</label>
+                    <select id="motion-type" class="custom-input">
+                        <option value="">Select Motion</option>
+                        <option value="walking">Walking</option>
+                        <option value="running">Running</option>
+                        <option value="jumping">Jumping</option>
+                        <option value="dancing">Dancing</option>
+                        <option value="fighting">Fighting</option>
+                        <option value="swimming">Swimming</option>
+                        <option value="flying">Flying</option>
+                        <option value="falling">Falling</option>
+                        <option value="climbing">Climbing</option>
+                        <option value="crawling">Crawling</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="motion-speed">Motion Speed</label>
+                    <select id="motion-speed" class="custom-input">
+                        <option value="">Select Speed</option>
+                        <option value="very-slow">Very slow</option>
+                        <option value="slow">Slow</option>
+                        <option value="normal">Normal</option>
+                        <option value="fast">Fast</option>
+                        <option value="very-fast">Very fast</option>
+                        <option value="time-lapse">Time lapse</option>
+                        <option value="slow-motion">Slow motion</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="physics-realism">Physics Realism</label>
+                    <select id="physics-realism" class="custom-input">
+                        <option value="">Select Realism Level</option>
+                        <option value="realistic-physics">Realistic physics</option>
+                        <option value="enhanced-physics">Enhanced physics</option>
+                        <option value="stylized-physics">Stylized physics</option>
+                        <option value="cartoon-physics">Cartoon physics</option>
+                        <option value="dream-physics">Dream-like physics</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="environmental-interaction">Environmental Interaction</label>
+                    <select id="environmental-interaction" class="custom-input">
+                        <option value="">Select Interaction</option>
+                        <option value="realistic-collisions">Realistic collisions</option>
+                        <option value="object-interaction">Object interaction</option>
+                        <option value="particle-effects">Particle effects</option>
+                        <option value="fluid-dynamics">Fluid dynamics</option>
+                        <option value="cloth-simulation">Cloth simulation</option>
+                        <option value="hair-physics">Hair physics</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="slider-container">
+                <label for="motion-blur">Motion Blur</label>
+                <input type="range" id="motion-blur" class="slider" min="0" max="100" value="40">
+                <div class="slider-value" id="blur-value">40</div>
+            </div>
+
+            <div class="generate-section">
+                <button class="generate-btn" onclick="generateMotionCraftPrompt()">Generate Motion Prompt</button>
+            </div>
+
+            <div class="output-section" id="motion-craft-output" style="display: none;">
+                <h3>🎭 Your Motion Craft Prompt:</h3>
+                <div class="output-text" id="motion-craft-result"></div>
+                <button class="copy-btn" onclick="copyToClipboard('motion-craft-result')">Copy to Clipboard</button>
+            </div>
+        </div>
+
+        <!-- Pro Controls Tab -->
+        <div id="pro-controls" class="tab-content">
+            <h2>⚙️ Pro Controls</h2>
+            <div class="warning-box">
+                <strong>⚠️ 18+ Content Warning:</strong> This section contains advanced realism parameters for mature content creation (18+ only)
+            </div>
+
+            <div class="advanced-controls">
+                <h3>Advanced Realism Settings</h3>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="anatomical-accuracy">
+                    <label for="anatomical-accuracy">Enhanced anatomical accuracy</label>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="realistic-textures">
+                    <label for="realistic-textures">Realistic skin and fabric textures</label>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="advanced-lighting">
+                    <label for="advanced-lighting">Advanced subsurface scattering</label>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="micro-expressions">
+                    <label for="micro-expressions">Detailed micro-expressions</label>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="realistic-movement">
+                    <label for="realistic-movement">Natural body movement physics</label>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="render-quality">Render Quality</label>
+                    <select id="render-quality" class="custom-input">
+                        <option value="">Select Quality</option>
+                        <option value="draft">Draft</option>
+                        <option value="standard">Standard</option>
+                        <option value="high">High</option>
+                        <option value="ultra">Ultra</option>
+                        <option value="maximum">Maximum</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="detail-enhancement">Detail Enhancement</label>
+                    <select id="detail-enhancement" class="custom-input">
+                        <option value="">Select Enhancement</option>
+                        <option value="standard-detail">Standard detail</option>
+                        <option value="enhanced-detail">Enhanced detail</option>
+                        <option value="ultra-detail">Ultra detail</option>
+                        <option value="maximum-detail">Maximum detail</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="generate-section">
+                <button class="generate-btn" onclick="generateProControlsPrompt()">Generate Pro Prompt</button>
+            </div>
+
+            <div class="output-section" id="pro-controls-output" style="display: none;">
+                <h3>⚙️ Your Pro Controls Prompt:</h3>
+                <div class="output-text" id="pro-controls-result"></div>
+                <button class="copy-btn" onclick="copyToClipboard('pro-controls-result')">Copy to Clipboard</button>
+            </div>
+        </div>
+
+        <!-- Realism Engine Tab -->
+        <div id="realism-engine" class="tab-content">
+            <h2>🎯 Realism Engine</h2>
+            <p><strong>Maximum realism and detail</strong> for mature content generation with advanced model optimization.</p>
+
+            <div class="warning-box">
+                <strong>⚠️ Mature Content Only:</strong> These settings are designed for adult content creation and require responsible use.
+            </div>
+
+            <div class="form-row">
+                <div class="input-group">
+                    <label for="realism-level">Realism Level</label>
+                    <select id="realism-level" class="custom-input">
+                        <option value="">Select Realism</option>
+                        <option value="photorealistic">Photorealistic</option>
+                        <option value="hyperrealistic">Hyperrealistic</option>
+                        <option value="cinematic-realism">Cinematic realism</option>
+                        <option value="artistic-realism">Artistic realism</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="model-optimization">Model Optimization</label>
+                    <select id="model-optimization" class="custom-input">
+                        <option value="">Select Optimization</option>
+                        <option value="standard-model">Standard model</option>
+                        <option value="enhanced-model">Enhanced model</option>
+                        <option value="premium-model">Premium model</option>
+                        <option value="ultimate-model">Ultimate model</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="slider-container">
+                <label for="detail-intensity">Detail Intensity</label>
+                <input type="range" id="detail-intensity" class="slider" min="0" max="100" value="80">
+                <div class="slider-value" id="detail-value">80</div>
+            </div>
+
+            <div class="slider-container">
+                <label for="realism-weight">Realism Weight</label>
+                <input type="range" id="realism-weight" class="slider" min="0" max="100" value="90">
+                <div class="slider-value" id="realism-value">90</div>
+            </div>
+
+            <div class="generate-section">
+                <button class="generate-btn" onclick="generateRealismEnginePrompt()">Generate Realism Prompt</button>
+            </div>
+
+            <div class="output-section" id="realism-engine-output" style="display: none;">
+                <h3>🎯 Your Realism Engine Prompt:</h3>
+                <div class="output-text" id="realism-engine-result"></div>
+                <button class="copy-btn" onclick="copyToClipboard('realism-engine-result')">Copy to Clipboard</button>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>WAN 2.2 Enhanced Prompt Builder - Optimized for AI Video Generation</p>
+            <p>Use responsibly and follow platform guidelines</p>
+        </div>
+    </div>
+
+    <script>
+        let selectedStylePack = '';
+        let ageVerified = false;
+        let pendingRestrictedTab = '';
+
+        function switchTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+
+            // Remove active class from all buttons
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => button.classList.remove('active'));
+
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        function checkAgeRestriction(tabName) {
+            if (ageVerified) {
+                switchTab(tabName);
+            } else {
+                pendingRestrictedTab = tabName;
+                document.getElementById('age-verification-modal').style.display = 'block';
+            }
+        }
+
+        function confirmAge() {
+            ageVerified = true;
+            closeModal();
+            if (pendingRestrictedTab) {
+                switchTab(pendingRestrictedTab);
+                pendingRestrictedTab = '';
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('age-verification-modal').style.display = 'none';
+            pendingRestrictedTab = '';
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('age-verification-modal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        function selectStylePack(element, packName) {
+            // Remove selection from all packs
+            const stylePacks = document.querySelectorAll('.style-pack');
+            stylePacks.forEach(pack => pack.classList.remove('selected'));
+
+            // Add selection to clicked pack
+            element.classList.add('selected');
+            selectedStylePack = packName;
+        }
+
+        function generateCinematicPrompt() {
+            const subject = document.getElementById('custom-subject').value;
+            const shotOpening = document.getElementById('shot-opening').value;
+            const cameraMovement = document.getElementById('camera-movement-main').value;
+            const motion = document.getElementById('motion').value;
+            const style = document.getElementById('style').value;
+            const lighting = document.getElementById('lighting').value;
+            const technical = document.getElementById('technical').value;
+
+            if (!subject) {
+                alert('Please enter a custom subject first!');
+                return;
+            }
+
+            let prompt = subject;
+
+            // Add cinematic elements
+            if (shotOpening) prompt += `, ${shotOpening.replace('-', ' ')}`;
+            if (cameraMovement) prompt += `, ${cameraMovement.replace('-', ' ')}`;
+            if (motion) prompt += `, ${motion}`;
+            if (lighting) prompt += `, ${lighting.replace('-', ' ')}`;
+            if (technical) prompt += `, ${technical.replace('-', ' ')}`;
+
+            // Add style pack enhancements
+            if (selectedStylePack) {
+                switch(selectedStylePack) {
+                    case 'film-noir':
+                        prompt += ', dramatic shadows, high contrast, venetian blind lighting, black and white cinematography';
+                        break;
+                    case 'cyberpunk':
+                        prompt += ', neon lighting, rain-soaked streets, digital atmosphere, futuristic cityscape';
+                        break;
+                    case 'golden-hour':
+                        prompt += ', warm golden tones, film grain, classic cinematography, soft natural lighting';
+                        break;
+                    case 'fantasy':
+                        prompt += ', soft focus, magical lighting, surreal atmosphere, ethereal glow';
+                        break;
+                    case 'action':
+                        prompt += ', dynamic angles, dramatic lighting, high energy, intense atmosphere';
+                        break;
+                    case 'natural':
+                        prompt += ', golden hour lighting, natural colors, peaceful mood, organic atmosphere';
+                        break;
+                    case 'horror':
+                        prompt += ', eerie shadows, cold lighting, ominous atmosphere, dramatic contrast';
+                        break;
+                    case 'studio':
+                        prompt += ', bright lighting, clean composition, professional setup, controlled environment';
+                        break;
+                }
+            }
+
+            // Add WAN 2.2 optimizations
+            prompt += ', cinematic composition, professional videography, high quality, detailed, masterpiece, WAN 2.2 optimized';
+
+            document.getElementById('cinematic-result').textContent = prompt;
+            document.getElementById('cinematic-output').style.display = 'block';
+        }
+
+        function generateStyleWeaverPrompt() {
+            const cameraAngle = document.getElementById('camera-angle').value;
+            const cameraMovement = document.getElementById('camera-movement').value;
+            const lightingSetup = document.getElementById('lighting-setup').value;
+            const colorGrading = document.getElementById('color-grading').value;
+            const depthOfField = document.getElementById('depth-of-field').value;
+            const filmGrain = document.getElementById('film-grain').value;
+
+            let prompt = 'Professional cinematic video';
+
+            if (cameraAngle) prompt += `, ${cameraAngle.replace('-', ' ')}`;
+            if (cameraMovement) prompt += `, ${cameraMovement.replace('-', ' ')}`;
+            if (lightingSetup) prompt += `, ${lightingSetup.replace('-', ' ')}`;
+            if (colorGrading) prompt += `, ${colorGrading.replace('-', ' ')}`;
+
+            if (depthOfField > 50) prompt += ', shallow depth of field, bokeh background';
+            else if (depthOfField < 30) prompt += ', deep focus, sharp throughout';
+
+            if (filmGrain > 50) prompt += ', heavy film grain, vintage texture';
+            else if (filmGrain > 20) prompt += ', subtle film grain';
+
+            prompt += ', cinematic quality, professional lighting, masterful composition, WAN 2.2 enhanced';
+
+            document.getElementById('style-weaver-result').textContent = prompt;
+            document.getElementById('style-weaver-output').style.display = 'block';
+        }
+
+        function generateMotionCraftPrompt() {
+            const motionType = document.getElementById('motion-type').value;
+            const motionSpeed = document.getElementById('motion-speed').value;
+            const physicsRealism = document.getElementById('physics-realism').value;
+            const environmentalInteraction = document.getElementById('environmental-interaction').value;
+            const motionBlur = document.getElementById('motion-blur').value;
+
+            let prompt = 'Realistic motion video';
+
+            if (motionType) prompt += `, ${motionType} motion`;
+            if (motionSpeed) prompt += `, ${motionSpeed.replace('-', ' ')} speed`;
+            if (physicsRealism) prompt += `, ${physicsRealism.replace('-', ' ')}`;
+            if (environmentalInteraction) prompt += `, ${environmentalInteraction.replace('-', ' ')}`;
+
+            if (motionBlur > 60) prompt += ', heavy motion blur, dynamic movement';
+            else if (motionBlur > 30) prompt += ', natural motion blur';
+            else if (motionBlur < 20) prompt += ', crisp motion, minimal blur';
+
+            prompt += ', natural movement, realistic physics, fluid animation, WAN 2.2 motion optimized';
+
+            document.getElementById('motion-craft-result').textContent = prompt;
+            document.getElementById('motion-craft-output').style.display = 'block';
+        }
+
+        function generateProControlsPrompt() {
+            const renderQuality = document.getElementById('render-quality').value;
+            const detailEnhancement = document.getElementById('detail-enhancement').value;
+
+            const anatomicalAccuracy = document.getElementById('anatomical-accuracy').checked;
+            const realisticTextures = document.getElementById('realistic-textures').checked;
+            const advancedLighting = document.getElementById('advanced-lighting').checked;
+            const microExpressions = document.getElementById('micro-expressions').checked;
+            const realisticMovement = document.getElementById('realistic-movement').checked;
+
+            let prompt = 'Professional high-quality video';
+
+            if (renderQuality) prompt += `, ${renderQuality} render quality`;
+            if (detailEnhancement) prompt += `, ${detailEnhancement.replace('-', ' ')}`;
+
+            if (anatomicalAccuracy) prompt += ', anatomically accurate, realistic proportions';
+            if (realisticTextures) prompt += ', realistic skin textures, detailed fabric';
+            if (advancedLighting) prompt += ', subsurface scattering, advanced lighting';
+            if (microExpressions) prompt += ', detailed facial expressions, subtle emotions';
+            if (realisticMovement) prompt += ', natural body physics, realistic movement';
+
+            prompt += ', professional grade, maximum detail, WAN 2.2 pro optimized, mature content';
+
+            document.getElementById('pro-controls-result').textContent = prompt;
+            document.getElementById('pro-controls-output').style.display = 'block';
+        }
+
+        function generateRealismEnginePrompt() {
+            const realismLevel = document.getElementById('realism-level').value;
+            const modelOptimization = document.getElementById('model-optimization').value;
+            const detailIntensity = document.getElementById('detail-intensity').value;
+            const realismWeight = document.getElementById('realism-weight').value;
+
+            let prompt = 'Ultra-realistic video generation';
+
+            if (realismLevel) prompt += `, ${realismLevel.replace('-', ' ')}`;
+            if (modelOptimization) prompt += `, ${modelOptimization.replace('-', ' ')} optimization`;
+
+            if (detailIntensity > 70) prompt += ', maximum detail intensity, ultra-detailed';
+            else if (detailIntensity > 40) prompt += ', enhanced detail level';
+
+            if (realismWeight > 80) prompt += ', maximum realism weight, photographic quality';
+            else if (realismWeight > 50) prompt += ', high realism factor';
+
+            prompt += ', hyperrealistic rendering, maximum quality, professional cinematography, WAN 2.2 realism engine, premium model, adult content optimized';
+
+            document.getElementById('realism-engine-result').textContent = prompt;
+            document.getElementById('realism-engine-output').style.display = 'block';
+        }
+
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                // Show temporary success message
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = 'rgba(76, 175, 80, 0.3)';
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = 'rgba(255, 255, 255, 0.1)';
+                }, 2000);
+            });
+        }
+
+        // Update slider values
+        document.getElementById('depth-of-field').addEventListener('input', function() {
+            document.getElementById('dof-value').textContent = this.value;
+        });
+
+        document.getElementById('film-grain').addEventListener('input', function() {
+            document.getElementById('grain-value').textContent = this.value;
+        });
+
+        document.getElementById('motion-blur').addEventListener('input', function() {
+            document.getElementById('blur-value').textContent = this.value;
+        });
+
+        document.getElementById('detail-intensity').addEventListener('input', function() {
+            document.getElementById('detail-value').textContent = this.value;
+        });
+
+        document.getElementById('realism-weight').addEventListener('input', function() {
+            document.getElementById('realism-value').textContent = this.value;
+        });
+    </script>
+</body>
+</html>
