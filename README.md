@@ -1,4 +1,4 @@
-```markdown
+
 # 🎬 prompt-weaver
 
 **Transform simple ideas into professional cinematic prompts optimized for WAN 2.2 video generation**
@@ -279,4 +279,3 @@ SOFTWARE.
 ---
 
 *Built with ❤️ for the WAN 2.2 community by [Genkanwall](https://github.com/Genkanwall)*
-```
